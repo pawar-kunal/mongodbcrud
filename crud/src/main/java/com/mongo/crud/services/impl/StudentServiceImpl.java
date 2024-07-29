@@ -1,8 +1,11 @@
 package com.mongo.crud.services.impl;
 
 import com.mongo.crud.models.Student;
+import com.mongo.crud.payloads.requests.LoginRequest;
 import com.mongo.crud.payloads.requests.RegistrationRequest;
+import com.mongo.crud.payloads.responses.LoginResponse;
 import com.mongo.crud.payloads.responses.MainResponse;
+import com.mongo.crud.payloads.responses.ProfileResponse;
 import com.mongo.crud.repositories.StudentRepository;
 import com.mongo.crud.services.StudentService;
 import org.springframework.beans.BeanUtils;
@@ -103,5 +106,38 @@ public class StudentServiceImpl implements StudentService {
             mainResponse.setFlag(false);
         }
         return mainResponse;
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest loginRequest) {
+        LoginResponse loginResponse = new LoginResponse();
+
+        Optional<Student> student = this.studentRepository.findByMobile(loginRequest.getMobile());
+        if (student.isPresent()){
+            loginResponse.setName(student.get().getName());
+            loginResponse.setStudentId(student.get().getStudentId());
+            loginResponse.setEmail(student.get().getEmail());
+            loginResponse.setMobile(student.get().getMobile());
+            loginResponse.setAddress(student.get().getAddress());
+            loginResponse.setRegistrationDate(student.get().getRegistrationDate());
+            loginResponse.setMessage("Login successfully.");
+            loginResponse.setResponseCode(HttpStatus.OK.value());
+            loginResponse.setFlag(true);
+        }else {
+            loginResponse.setMessage("Student not found.");
+            loginResponse.setResponseCode(HttpStatus.BAD_REQUEST.value());
+            loginResponse.setFlag(false);
+        }
+        return loginResponse;
+    }
+
+    @Override
+    public ProfileResponse profile(String studentId) {
+//        ProfileResponse profileResponse = this.studentRepository.profile(studentId);
+
+        ProfileResponse profileResponse = new ProfileResponse();
+        Optional<Student> student = this.studentRepository.findById(studentId);
+        BeanUtils.copyProperties(student.get(),profileResponse);
+        return profileResponse;
     }
 }

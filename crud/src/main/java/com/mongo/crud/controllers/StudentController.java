@@ -1,10 +1,12 @@
 package com.mongo.crud.controllers;
 
 import com.mongo.crud.models.Student;
+import com.mongo.crud.payloads.requests.LoginRequest;
 import com.mongo.crud.payloads.requests.RegistrationRequest;
+import com.mongo.crud.payloads.responses.LoginResponse;
 import com.mongo.crud.payloads.responses.MainResponse;
+import com.mongo.crud.payloads.responses.ProfileResponse;
 import com.mongo.crud.services.StudentService;
-import com.mongo.crud.services.impl.StudentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,4 +70,22 @@ public class StudentController {
             return new ResponseEntity(mainResponse, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest){
+        LoginResponse loginResponse = this.studentService.login(loginRequest);
+        if (Boolean.TRUE.equals(loginResponse.getFlag())){
+            return new ResponseEntity(loginResponse, HttpStatus.OK);
+        }else {
+            return new ResponseEntity(loginResponse, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/profile/{studentId}")
+    public ResponseEntity profile(@PathVariable("studentId") String studentId){
+        ProfileResponse profileResponse = this.studentService.profile(studentId);
+        return new ResponseEntity(profileResponse, HttpStatus.OK);
+    }
+
+
 }
